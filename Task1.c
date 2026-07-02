@@ -3,6 +3,12 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 
+// Shared resource
+int counter = 0;
+
+// Mutex for synchronization
+pthread_mutex_t mutex;
+
 // System information thread
 void *systemInfo(void *arg)
 {
@@ -16,18 +22,21 @@ void *systemInfo(void *arg)
     return NULL;
 }
 
-int counter = 0;
 // Simulates a disk read operation
 void *diskIO(void *arg)
 {
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
+        pthread_mutex_lock(&mutex);
+
         int temp = counter;
-        sleep(1);  
-        temp++;       
-        counter = temp;   //counter is accessed as a shared variable simultaneously by two threads
+        sleep(1);
+        temp++;
+        counter = temp;
 
         printf("[Disk Thread] Counter = %d\n", counter);
+
+        pthread_mutex_unlock(&mutex);
     }
 
     return NULL;
@@ -36,14 +45,18 @@ void *diskIO(void *arg)
 // Simulates a user process
 void *userProcess(void *arg)
 {
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
+        pthread_mutex_lock(&mutex);
+
         int temp = counter;
-        sleep(1);          
+        sleep(1);
         temp++;
         counter = temp;
 
         printf("[User Thread] Counter = %d\n", counter);
+
+        pthread_mutex_unlock(&mutex);
     }
 
     return NULL;
@@ -52,6 +65,9 @@ void *userProcess(void *arg)
 int main()
 {
     pthread_t thread1, thread2, thread3;
+
+    // Initialize mutex
+    pthread_mutex_init(&mutex, NULL);
 
     printf("Main Process ID: %d\n\n", getpid());
 
@@ -62,6 +78,12 @@ int main()
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
     pthread_join(thread3, NULL);
+
+    printf("\nExpected Counter = 10\n");
+    printf("Final Counter = %d\n", counter);
+
+    // Destroy mutex
+    pthread_mutex_destroy(&mutex);
 
     printf("\nAll threads completed.\n");
 
