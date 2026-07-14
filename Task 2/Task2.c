@@ -4,6 +4,20 @@
 
 int pages[size] = {1,2,3,2,4,1,5,2,1,2};
 
+void printFrames(int frame[], int frameSize)
+{
+    int i;
+    printf("Frames: ");
+    for(i = 0; i < frameSize; i++)
+    {
+        if(frame[i] == -1)
+            printf("- ");
+        else
+            printf("%d ", frame[i]);
+    }
+    printf("\n");
+}
+// FIFO implemented
 void FIFO(int frameSize)
 {
     int frame[10];
@@ -14,22 +28,20 @@ void FIFO(int frameSize)
 
     printf("\nFIFO Simulation\n");
 
-    for(i=0;i<size;i++)
-    {
-        int found=0;
-        for(j=0;j<frameSize;j++){
+    for(i=0;i<size;i++){
+      int found=0;
+      for(j=0;j<frameSize;j++){
             if(frame[j]==pages[i]){
                 found=1;
                 break;}}
-        if(found){
-            printf("Page %d -> HIT\n",pages[i]);}
-        else{
-            printf("Page %d -> FAULT\n",pages[i]);
-            frame[index]=pages[i];
-            index=(index+1)%frameSize;
-        }
+      if(found){printf("Page %d -> HIT\n",pages[i]);}
+      else{printf("Page %d -> FAULT\n",pages[i]);
+          frame[index]=pages[i];
+          index=(index+1)%frameSize;}
+      printFrames(frame,frameSize);
     }
 }
+
 int main()
 {   int pageSize;
     int frameSize;
