@@ -60,24 +60,15 @@ int main()
         printf("TIME\n");
         printf("ECHO <message>\n");
         printf("QUIT\n");
-
         printf("Enter Command: ");
-
         fgets(buffer, BUFFER_SIZE, stdin);
-
         send(clientSocket, buffer, strlen(buffer), 0);
-
         memset(buffer, 0, BUFFER_SIZE);
-
         recv(clientSocket, buffer, BUFFER_SIZE, 0);
-
         printf("Server: %s\n", buffer);
-
         if (strncmp(buffer, "Goodbye", 7) == 0)
             break;
     }
-
     close(clientSocket);
-
     return 0;
 }

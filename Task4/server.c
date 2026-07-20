@@ -12,7 +12,6 @@ void *handleClient(void *socket_desc)
 {
     int clientSocket = *(int *)socket_desc;
     free(socket_desc);
-
     char buffer[BUFFER_SIZE];
     char username[50];
     char password[50];
@@ -36,20 +35,15 @@ void *handleClient(void *socket_desc)
         close(clientSocket);
         pthread_exit(NULL);
     }
-
     send(clientSocket, "Authentication Successful\n", 26, 0);
 
     while (1)
     {
         memset(buffer, 0, BUFFER_SIZE);
-
         int bytes = recv(clientSocket, buffer, BUFFER_SIZE, 0);
-
         if (bytes <= 0)
             break;
-
         buffer[strcspn(buffer, "\n")] = 0;
-
         if (strcmp(buffer, "TIME") == 0)
         {
             send(clientSocket, "Server Time Feature\n", 20, 0);
@@ -68,57 +62,41 @@ void *handleClient(void *socket_desc)
             send(clientSocket, "Invalid Command\n", 16, 0);
         }
     }
-
     close(clientSocket);
     printf("Client disconnected.\n");
     pthread_exit(NULL);
 }
-
 int main()
 {
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
-
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-
     if (serverSocket < 0)
     {
         printf("Socket creation failed.\n");
         return 1;
     }
-
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(PORT);
     serverAddr.sin_addr.s_addr = INADDR_ANY;
-
     bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
-
     listen(serverSocket, 5);
-
     printf("Server is running on port %d...\n", PORT);
-
     while (1)
     {
         clientSocket = accept(serverSocket,
-                              (struct sockaddr *)&clientAddr,
-                              &clientLen);
+                              (struct sockaddr *)&clientAddr,&clientLen);
 
         if (clientSocket < 0)
             continue;
-
         printf("Client connected.\n");
-
         pthread_t tid;
-
         int *newSocket = malloc(sizeof(int));
         *newSocket = clientSocket;
-
         pthread_create(&tid, NULL, handleClient, (void *)newSocket);
         pthread_detach(tid);
     }
-
     close(serverSocket);
-
     return 0;
 }
