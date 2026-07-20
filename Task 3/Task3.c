@@ -52,6 +52,23 @@ void createFile() {
     printf("Assignment file created successfully.\n");
     fclose(fp);
 }
+// Read Assignment File
+void readFile() {
+    char filename[50];
+    char ch;
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    FILE *fp = fopen(filename, "r");
+    if(fp == NULL){
+        printf("File not found.\n");
+        return;
+    }
+    printf("\n File Content \n");
+    while((ch = fgetc(fp)) != EOF){
+        printf("%c", ch);
+    }
+    fclose(fp);
+}
 
 //Main Function
 int main() {
@@ -93,7 +110,7 @@ int main() {
                     createFile();
                     break;
                 case 2:
-                    printf("Read Assignment File feature coming soon.\n");
+                    readFile();
                     break;
                 case 3:
                     printf("Write Assignment File feature coming soon.\n");
@@ -130,7 +147,7 @@ int main() {
             scanf("%d",&choice);
             switch(choice){
                 case 1:
-                    printf("Read Assignment File feature coming soon.\n");
+                    readFile();
                     break;
                 case 2:
                     printf("View File Permissions feature coming soon.\n");
