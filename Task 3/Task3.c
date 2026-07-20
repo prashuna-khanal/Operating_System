@@ -1,7 +1,36 @@
 #include <stdio.h>
+#include <string.h>
+
+//Login Details
+void login() {
+    char username[20];
+    char password[20];
+    printf("\nUsername: ");
+    scanf("%s", username);
+    printf("Password: ");
+    scanf("%s", password);
+    //strcmp is used for comparison of each characters
+    if(strcmp(username, "lecturer") == 0 && strcmp(password, "lec123") == 0) {
+        loggedIn = 1;
+        strcpy(role, "Lecturer");
+        printf("\nLogin Successful!\n");
+        printf("Welcome Lecturer\n");
+    }
+    else if(strcmp(username, "student") == 0 && strcmp(password, "stu123") == 0) {
+        loggedIn = 1;
+        strcpy(role, "Student");
+        printf("\nLogin Successful!\n");
+        printf("Welcome Student\n");
+    }
+    else {
+        printf("\nInvalid Username or Password\n");
+    }
+}
 
 int main() {
     int choice;
+    int loggedIn = 0;
+    char role[20];
 
     do {
         printf(" Student Assignment File Management\n");
@@ -20,7 +49,7 @@ int main() {
 
         switch(choice) {
             case 1:
-                printf("Login feature coming soon.\n");
+                login();
                 break;
             case 2:
                 printf("Create File feature coming soon.\n");
@@ -41,7 +70,9 @@ int main() {
                 printf("View Permission feature coming soon.\n");
                 break;
             case 8:
-                printf("Logout feature coming soon.\n");
+                loggedIn = 0;
+                strcpy(role, "");
+                printf("Logged Out Successfully.\n");
                 break;
             case 9:
                 printf("Exiting System...\n");
