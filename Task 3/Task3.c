@@ -69,6 +69,24 @@ void readFile() {
     }
     fclose(fp);
 }
+// Write Assignment File
+void writeFile() {
+    char filename[50];
+    char text[1000];
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    FILE *fp = fopen(filename, "a");
+    if(fp == NULL){
+        printf("File not found.\n");
+        return;
+    }
+    getchar();   // Clear newline
+    printf("Enter text:\n");
+    fgets(text, sizeof(text), stdin);
+    fprintf(fp, "%s", text);
+    fclose(fp);
+    printf("Content written successfully.\n");
+}
 
 //Main Function
 int main() {
@@ -113,7 +131,7 @@ int main() {
                     readFile();
                     break;
                 case 3:
-                    printf("Write Assignment File feature coming soon.\n");
+                    writeFile();
                     break;
                 case 4:
                     printf("Delete Assignment File feature coming soon.\n");
