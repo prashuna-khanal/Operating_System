@@ -4,6 +4,15 @@
 
 int loggedIn = 0;
 char role[20];
+#define MAX_FILES 20
+struct Permission{
+    char filename[50];
+    int read;
+    int write;
+    int execute;};
+struct Permission permissions[MAX_FILES];
+int fileCount = 0;
+
 //LOGIN
 void login() {
     char username[20];
@@ -49,6 +58,11 @@ void createFile() {
         printf("Unable to create file.\n");
         return;
     }
+    strcpy(permissions[fileCount].filename, filename);
+    permissions[fileCount].read = 1;
+    permissions[fileCount].write = 1;
+    permissions[fileCount].execute = 0;
+    fileCount++;
     printf("Assignment file created successfully.\n");
     fclose(fp);
 }
@@ -58,6 +72,22 @@ void readFile() {
     char ch;
     printf("\nEnter Assignment File Name: ");
     scanf("%s", filename);
+    int i;
+    int found = 0;
+    for(i = 0; i < fileCount; i++) {
+        if(strcmp(filename, permissions[i].filename) == 0) {
+            found = 1;
+            if(permissions[i].read == 0) {
+                printf("Read Permission Denied.\n");
+                return;
+            }
+            break;
+        }
+    }
+    if(found == 0){
+        printf("Permission record not found.\n");
+        return;
+    }
     FILE *fp = fopen(filename, "r");
     if(fp == NULL){
         printf("File not found.\n");
@@ -75,6 +105,22 @@ void writeFile() {
     char text[1000];
     printf("\nEnter Assignment File Name: ");
     scanf("%s", filename);
+    int i;
+    int found = 0;
+    for(i = 0; i < fileCount; i++) {
+        if(strcmp(filename, permissions[i].filename) == 0) {
+            found = 1;
+            if(strcmp(role,"Student")==0 && permissions[i].write==0){
+                printf("Write Permission Denied.\n");
+                return;
+            }
+            break;
+        }
+    }
+    if(found == 0){
+        printf("Permission record not found.\n");
+        return;
+    }
     FILE *fp = fopen(filename, "a");
     if(fp == NULL){
         printf("File not found.\n");
@@ -86,6 +132,81 @@ void writeFile() {
     fprintf(fp, "%s", text);
     fclose(fp);
     printf("Content written successfully.\n");
+}
+void executeFile() {
+    char filename[50];
+    int i;
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    int found = 0;
+    for(i=0;i<fileCount;i++){
+        if(strcmp(filename,permissions[i].filename)==0){
+            found = 1;
+            if(permissions[i].execute==0){
+                printf("Execute Permission Denied.\n");
+                return;
+            }
+            printf("Executing %s...\n",filename);
+            printf("Execution Complete.\n");
+            return;
+        }
+    }
+    if(found==0){
+        printf("Permission record not found.\n");
+    }
+}
+// Delete Assignment File
+void deleteFile() {
+
+    char filename[50];
+
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+
+    if(remove(filename) == 0){
+        printf("Assignment file deleted successfully.\n");
+    }
+    else{
+        printf("File not found or unable to delete.\n");
+    }
+}
+void managePermission() {
+    char filename[50];
+    int i;
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    for(i=0;i<fileCount;i++){
+        if(strcmp(filename, permissions[i].filename)==0){
+            printf("Read Permission (1=Yes 0=No): ");
+            scanf("%d",&permissions[i].read);
+            printf("Write Permission (1=Yes 0=No): ");
+            scanf("%d",&permissions[i].write);
+            printf("Execute Permission (1=Yes 0=No): ");
+            scanf("%d",&permissions[i].execute);
+            printf("Permissions Updated Successfully.\n");
+            return;
+        }
+    }
+    printf("File not found.\n");
+}
+void viewPermission(){
+    char filename[50];
+    int i;
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    for(i=0;i<fileCount;i++){
+        if(strcmp(filename, permissions[i].filename)==0){
+            printf("\nPermissions for %s\n", filename);
+            printf("Read    : %s\n",
+                permissions[i].read ? "Yes" : "No");
+            printf("Write   : %s\n",
+                permissions[i].write ? "Yes" : "No");
+            printf("Execute : %s\n",
+                permissions[i].execute ? "Yes" : "No");
+            return;
+        }
+    }
+    printf("File not found.\n");
 }
 
 //Main Function
@@ -134,13 +255,13 @@ int main() {
                     writeFile();
                     break;
                 case 4:
-                    printf("Delete Assignment File feature coming soon.\n");
+                    deleteFile();
                     break;
                 case 5:
-                    printf("Manage File Permissions feature coming soon.\n");
+                    managePermission();
                     break;
                 case 6:
-                    printf("View File Permissions feature coming soon.\n");
+                    viewPermission();
                     break;
                 case 7:
                     loggedIn = 0;
@@ -158,29 +279,37 @@ int main() {
         else{
             printf("\n Student Menu \n");
             printf("1. Read Assignment File\n");
-            printf("2. View File Permissions\n");
-            printf("3. Logout\n");
-            printf("4. Exit\n");
+            printf("2. Write Assignment File\n");
+            printf("3. Execute Assignment File\n");
+            printf("4. View File Permissions\n");
+            printf("5. Logout\n");
+            printf("6. Exit\n");
             printf("\nEnter your choice: ");
             scanf("%d",&choice);
             switch(choice){
-                case 1:
-                    readFile();
-                    break;
-                case 2:
-                    printf("View File Permissions feature coming soon.\n");
-                    break;
-                case 3:
-                    loggedIn = 0;
-                    strcpy(role,"");
-                    printf("Logged Out Successfully.\n");
-                    break;
-                case 4:
-                    printf("Thank You!\n");
-                    return 0;
-                default:
-                    printf("Invalid Choice!\n");
-            }
+              case 1:
+                  readFile();
+                  break;
+              case 2:
+                  writeFile();
+                  break;
+              case 3:
+                  executeFile();
+                  break;
+              case 4:
+                  viewPermission();
+                  break;
+              case 5:
+                  loggedIn = 0;
+                  strcpy(role,"");
+                  printf("Logged Out Successfully.\n");
+                  break;
+              case 6:
+                  printf("Thank You!\n");
+                  return 0;
+              default:
+                  printf("Invalid Choice!\n");
+          }
         }
     }
     return 0;
