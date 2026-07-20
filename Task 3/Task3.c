@@ -39,6 +39,21 @@ void login() {
     printf("\nToo many failed login attempts.\n");
     exit(0);
 }
+// Create Assignment File
+void createFile() {
+    char filename[50];
+    printf("\nEnter Assignment File Name: ");
+    scanf("%s", filename);
+    FILE *fp = fopen(filename, "w");
+    if(fp == NULL){
+        printf("Unable to create file.\n");
+        return;
+    }
+    printf("Assignment file created successfully.\n");
+    fclose(fp);
+}
+
+//Main Function
 int main() {
     int choice;
     while (1) {
@@ -75,7 +90,7 @@ int main() {
             scanf("%d",&choice);
             switch(choice){
                 case 1:
-                    printf("Create Assignment File feature coming soon.\n");
+                    createFile();
                     break;
                 case 2:
                     printf("Read Assignment File feature coming soon.\n");
