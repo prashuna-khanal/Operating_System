@@ -14,6 +14,7 @@ struct Permission{
 };
 struct Permission permissions[MAX_FILES];
 int fileCount = 0;
+void writeLog(char action[], char filename[]);
 
 //LOGIN
 void login() {
@@ -72,55 +73,69 @@ void createFile() {
     fclose(fp);
 }
 // Read Assignment File
-void readFile() {
+void readFile()
+{
     char filename[50];
     char ch;
-    printf("\nEnter Assignment File Name: ");
-    scanf("%s", filename);
     int i;
     int found = 0;
-    for(i = 0; i < fileCount; i++) {
-        if(strcmp(filename, permissions[i].filename) == 0) {
+    printf("\nEnter Assignment File Name: ");
+    scanf("%49s", filename);
+    for(i = 0; i < fileCount; i++){
+        if(strcmp(filename, permissions[i].filename) == 0){
             found = 1;
-            if
-            {
-            if(strchr(permissions[i].student,'r')==NULL){
+            if(strcmp(role, "Lecturer") == 0){
+                if(strchr(permissions[i].lecturer, 'r') == NULL){
                     printf("Read Permission Denied.\n");
                     return;}
+                    }
+            else{
+                if(strchr(permissions[i].student, 'r') == NULL){
+                    printf("Read Permission Denied.\n");
+                    return;
+                }
             }
             break;
         }
     }
-    if(found == 0){
+    if(!found){
         printf("Permission record not found.\n");
-        return;
-    }
+        return;}
     FILE *fp = fopen(filename, "r");
     if(fp == NULL){
         printf("File not found.\n");
-        return;
-    }
-    printf("\n File Content \n");
-    while((ch = fgetc(fp)) != EOF){
-        printf("%c", ch);
-    }
-    writeLog("Read", filename);
+        return;}
+    printf("\nFile Content\n");
+    while((ch = fgetc(fp)) != EOF)
+        putchar(ch);
     fclose(fp);
+    writeLog("Read", filename);
 }
 // Write Assignment File
-void writeFile() {
+void writeFile()
+{
     char filename[50];
     char text[1000];
-    printf("\nEnter Assignment File Name: ");
-    scanf("%s", filename);
     int i;
     int found = 0;
-    for(i = 0; i < fileCount; i++) {
-        if(strcmp(filename, permissions[i].filename) == 0) {
+    printf("\nEnter Assignment File Name: ");
+    scanf("%49s", filename);
+    for(i = 0; i < fileCount; i++)
+    {
+        if(strcmp(filename, permissions[i].filename) == 0)
+        {
             found = 1;
-            if
+            if(strcmp(role, "Lecturer") == 0)
             {
-                if(strchr(permissions[i].student,'w')==NULL)
+                if(strchr(permissions[i].lecturer, 'w') == NULL)
+                {
+                    printf("Write Permission Denied.\n");
+                    return;
+                }
+            }
+            else
+            {
+                if(strchr(permissions[i].student, 'w') == NULL)
                 {
                     printf("Write Permission Denied.\n");
                     return;
@@ -129,16 +144,18 @@ void writeFile() {
             break;
         }
     }
-    if(found == 0){
+    if(!found)
+    {
         printf("Permission record not found.\n");
         return;
     }
     FILE *fp = fopen(filename, "a");
-    if(fp == NULL){
+    if(fp == NULL)
+    {
         printf("File not found.\n");
         return;
     }
-    getchar();   // Clear newline
+    getchar();
     printf("Enter text:\n");
     fgets(text, sizeof(text), stdin);
     fprintf(fp, "%s", text);
@@ -146,6 +163,7 @@ void writeFile() {
     writeLog("Written", filename);
     printf("Content written successfully.\n");
 }
+//EXECUTE
 void executeFile() {
     char filename[50];
     int i;
@@ -155,14 +173,22 @@ void executeFile() {
     for(i=0;i<fileCount;i++){
         if(strcmp(filename,permissions[i].filename)==0){
             found = 1;
-            if
-            {
-                if(strchr(permissions[i].student,'x')==NULL)
+                if(strcmp(role,"Lecturer")==0)
                 {
-                    printf("Execute Permission Denied.\n");
-                    return;
+                    if(strchr(permissions[i].lecturer,'x')==NULL)
+                    {
+                        printf("Execute Permission Denied.\n");
+                        return;
+                    }
                 }
-            }
+                else
+                {
+                    if(strchr(permissions[i].student,'x')==NULL)
+                    {
+                        printf("Execute Permission Denied.\n");
+                        return;
+                    }
+                }
             printf("Executing %s...\n",filename);
             printf("Execution Complete.\n");
             return;
@@ -338,11 +364,17 @@ int main() {
             printf("4. Delete Assignment File\n");
             printf("5. Manage File Permissions\n");
             printf("6. View File Permissions\n");
-            printf("7. Logout\n");
-            printf("8. Exit\n");
+            printf("7. Encrypt Assignment File\n");
+            printf("8. Decrypt Assignment File\n");
+            printf("9. Logout\n");
+            printf("10. Exit\n");
             printf("\nEnter your choice: ");
-            scanf("%d",&choice);
-            switch(choice){
+            if(scanf("%d", &choice) != 1){
+              printf("Invalid Input!\n");
+              while(getchar() != '\n');
+              continue;}                      
+            switch(choice)
+            {
                 case 1:
                     createFile();
                     break;
@@ -362,26 +394,21 @@ int main() {
                     viewPermission();
                     break;
                 case 7:
-                    loggedIn = 0;
-                    strcpy(role,"");
-                    printf("Logged Out Successfully.\n");
-                    break;
-                case 8:
                     encryptFile();
                     break;
-
-                case 9:
+                case 8:
                     decryptFile();
                     break;
-
-                case 10:
-                    loggedIn=0;
-                    strcpy(role,"");
+                case 9:
+                    loggedIn = 0;
+                    strcpy(role, "");
                     printf("Logged Out Successfully.\n");
                     break;
-
-                case 11:
+                case 10:
+                    printf("Thank You!\n");
                     return 0;
+                default:
+                    printf("Invalid Choice!\n");
             }
         }
         //STUDENT MENU 
